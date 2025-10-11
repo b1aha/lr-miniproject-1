@@ -28,11 +28,18 @@ class FootForceProfile:
             dt (float): Timestep duration (s)
         """
         # TODO: integrate the oscillator equation
+        if 0 <= self.theta < np.pi:
+            fi = self.f1
+        else:
+            fi = self.f0
+
+        self.theta += 2 * np.pi * fi * dt
+        self.theta %= 2 * np.pi
 
     def phase(self) -> float:
         """Get oscillator phase in [0, 2pi] range."""
         # TODO: return the phase of the oscillator in [0, 2pi] range
-        return 0
+        return self.theta
 
     def force(self) -> np.ndarray:
         """
@@ -42,14 +49,17 @@ class FootForceProfile:
             np.ndarray: An R^3 array [Fx, Fy, Fz]
         """
         # TODO: return the force vector given the oscillator state
-        return np.zeros(3)
+        if np.sin(self.theta) < 0:
+            return self.F * np.sin(self.theta)
+        else:
+            return np.zeros(3)
 
     def impulse_duration(self) -> float:
         """Return impulse duration in seconds."""
         # TODO: compute the impulse duration in seconds
-        return 0
+        return 1 / (2*self.f0)
 
     def idle_duration(self) -> float:
         """Return idle time between impulses in seconds"""
         # TODO: compute the idle duration in seconds
-        return 0
+        return 1 / (2*self.f1)
