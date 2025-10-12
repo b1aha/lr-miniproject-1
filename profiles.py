@@ -1,9 +1,11 @@
-# ~/profiles.py
-# Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
-# École Polytechnique Fédérale de Lausanne,
-# CH-1015 Lausanne,
-# Switzerland
-# ================================================
+"""
+~/profiles.py
+Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
+École Polytechnique Fédérale de Lausanne,
+CH-1015 Lausanne,
+Switzerland
+"""
+
 import numpy as np
 
 

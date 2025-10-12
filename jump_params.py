@@ -1,9 +1,11 @@
-# ~/jump_params.py
-# Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
-# École Polytechnique Fédérale de Lausanne,
-# CH-1015 Lausanne,
-# Switzerland
-# ================================================
+"""
+~/jump_params.py
+Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
+École Polytechnique Fédérale de Lausanne,
+CH-1015 Lausanne,
+Switzerland
+"""
+
 JUMP_PARAMS = {
     "forward": {
         "IMPULSE_F0": 3.8,

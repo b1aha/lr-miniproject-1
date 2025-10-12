@@ -1,9 +1,11 @@
-# ~/quadruped_jump.py
-# Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
-# École Polytechnique Fédérale de Lausanne,
-# CH-1015 Lausanne,
-# Switzerland
-# ================================================
+"""
+~/quadruped_jump.py
+Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
+École Polytechnique Fédérale de Lausanne,
+CH-1015 Lausanne,
+Switzerland
+"""
+
 import numpy as np
 from env.simulation import QuadSimulator, SimulationOptions
 from profiles import FootForceProfile
