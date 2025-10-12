@@ -5,11 +5,15 @@ Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
 CH-1015 Lausanne,
 Switzerland
 """
+# TODO : MAKE OFFSETS PARAMETERS PER JUMP TYPE
+# TODO : CREATE VALUABLE DOCSTRINGS/COMMENTS
 
 import numpy as np
+import matplotlib.pyplot as plt
+import sys
+
 from env.simulation import QuadSimulator, SimulationOptions
 from profiles import FootForceProfile
-import matplotlib.pyplot as plt
 from jump_params import JUMP_PARAMS
 
 N_LEGS = 4
@@ -256,6 +260,5 @@ def apply_force_profile(
 
 
 if __name__ == "__main__":
-    import sys
     jt = sys.argv[1] if len(sys.argv) > 1 else "forward"
     quadruped_jump(jt)

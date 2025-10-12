@@ -5,18 +5,21 @@ Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
 CH-1015 Lausanne,
 Switzerland
 """
+# TODO : CREATE VALUABLE DOCSTRINGS/COMMENTS
 
 import numpy as np
 
 
 class FootForceProfile:
-    def __init__(self, f0: float, f1: float, Fx: float, Fy: float, Fz: float):
+    def __init__(
+        self, f0: float, f1: float, Fx: float, Fy: float, Fz: float
+    ) -> None:
         self.theta = 0.0
         self.f0 = float(f0)
         self.f1 = float(f1)
         self.F = np.array([Fx, Fy, Fz], dtype=float)
 
-    def step(self, dt: float):
+    def step(self, dt: float) -> None:
         fi = self.f0 if np.sin(self.theta) < 0.0 else self.f1
         self.theta += 2.0 * np.pi * fi * dt
         self.theta %= 2.0 * np.pi

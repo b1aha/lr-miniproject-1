@@ -5,6 +5,7 @@ Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
 CH-1015 Lausanne,
 Switzerland
 """
+# TODO : MAKE OFFSETS PARAMETERS PER JUMP TYPE
 
 JUMP_PARAMS = {
     "forward": {
@@ -13,25 +14,25 @@ JUMP_PARAMS = {
         "FORCE_FX": 140.0,
         "FORCE_FY": 0.0,
         "FORCE_FZ": 370.0,
-        "N_JUMPS": 10,
+        "N_JUMPS": 20,
         "K_VMC": 0.0,
     },
     "lateral_left": {
-        "IMPULSE_F0": 3.8,
-        "IDLE_F1": 1.0,
+        "IMPULSE_F0": 1.2,
+        "IDLE_F1": 0.8,
         "FORCE_FX": 0.0,
-        "FORCE_FY": 140.0,
-        "FORCE_FZ": 320.0,
-        "N_JUMPS": 10,
+        "FORCE_FY": 40.0,
+        "FORCE_FZ": 230.0,
+        "N_JUMPS": 20,
         "K_VMC": 0.0,
     },
     "lateral_right": {
-        "IMPULSE_F0": 3.8,
-        "IDLE_F1": 1.0,
+        "IMPULSE_F0": 1.2,
+        "IDLE_F1": 0.8,
         "FORCE_FX": 0.0,
-        "FORCE_FY": -140.0,
-        "FORCE_FZ": 320.0,
-        "N_JUMPS": 10,
+        "FORCE_FY": -40.0,
+        "FORCE_FZ": 230.0,
+        "N_JUMPS": 20,
         "K_VMC": 0.0,
     },
     "twist_ccw": {
