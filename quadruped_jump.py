@@ -9,7 +9,7 @@ import numpy as np
 from env.simulation import QuadSimulator, SimulationOptions
 from profiles import FootForceProfile
 import matplotlib.pyplot as plt
-from jump_params import JUMP_CONFIGS
+from jump_params import JUMP_PARAMS
 
 N_LEGS = 4
 N_JOINTS = 3
@@ -20,13 +20,12 @@ X_OFFSET = 0.0011
 
 
 def quadruped_jump(jump_type="forward"):
-    params = JUMP_CONFIGS[jump_type]
+    params = JUMP_PARAMS[jump_type]
     IMPULSE_F0 = params["IMPULSE_F0"]
     IDLE_F1 = params["IDLE_F1"]
     FORCE_FX = params["FORCE_FX"]
     FORCE_FY = params["FORCE_FY"]
     FORCE_FZ = params["FORCE_FZ"]
-    TORQUE_TZ = params["TORQUE_TZ"]
     N_JUMPS = params["N_JUMPS"]
     KP_XY = params["KP_XY"]
     KP_Z = params["KP_Z"]
@@ -68,9 +67,17 @@ def quadruped_jump(jump_type="forward"):
         pos_log.append(np.array(simulator.get_base_position()))
 
         tau = np.zeros(N_JOINTS * N_LEGS)
-        tau += nominal_position(simulator, KP_XY, KP_Z, KD_FLIGHT_XY, KD_FLIGHT_Z, KD_STANCE_XY, KD_STANCE_Z)
+        tau += nominal_position(
+            simulator,
+            KP_XY,
+            KP_Z,
+            KD_FLIGHT_XY,
+            KD_FLIGHT_Z,
+            KD_STANCE_XY,
+            KD_STANCE_Z
+        )
         tau += gravity_compensation(simulator)
-        tau += apply_force_profile(simulator, force_profile, TORQUE_TZ)
+        tau += apply_force_profile(simulator, force_profile)
 
         simulator.set_motor_targets(tau)
         simulator.step()
@@ -121,7 +128,15 @@ def _leg_target_offsets(leg_id: int) -> np.ndarray:
         return np.array([-x_offset, +y_offset, z_offset])
 
 
-def nominal_position(simulator, KP_XY, KP_Z, KD_FLIGHT_XY, KD_FLIGHT_Z, KD_STANCE_XY, KD_STANCE_Z) -> np.ndarray:
+def nominal_position(
+    simulator,
+    KP_XY,
+    KP_Z,
+    KD_FLIGHT_XY,
+    KD_FLIGHT_Z,
+    KD_STANCE_XY,
+    KD_STANCE_Z
+) -> np.ndarray:
     tau = np.zeros(N_JOINTS * N_LEGS)
     foot_contacts = simulator.get_foot_contacts()
     Kp = np.diag([KP_XY, KP_XY, KP_Z])
@@ -155,8 +170,7 @@ def gravity_compensation(simulator: "QuadSimulator") -> np.ndarray:
 
 
 def apply_force_profile(simulator: "QuadSimulator",
-                        force_profile: FootForceProfile,
-                        torque_z: float = 0.0) -> np.ndarray:
+                        force_profile: FootForceProfile) -> np.ndarray:
     tau = np.zeros(N_JOINTS * N_LEGS)
     F = force_profile.force()
     foot_contacts = simulator.get_foot_contacts()
@@ -170,8 +184,6 @@ def apply_force_profile(simulator: "QuadSimulator",
         if foot_contacts[leg_id]:
             J, _ = simulator.get_jacobian_and_position(leg_id)
             tau_i = J.T @ F_use
-            # Add Z-axis torque for twist (distribute equally)
-            tau_i[2] += torque_z / N_LEGS
         else:
             tau_i = np.zeros(3)
         start = leg_id * N_JOINTS
