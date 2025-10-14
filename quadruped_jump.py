@@ -5,8 +5,6 @@ Oct 2025; Jiri Blaha, Giulia Cortelazzo, Semih Zaman
 CH-1015 Lausanne,
 Switzerland
 """
-# TODO : MAKE OFFSETS PARAMETERS PER JUMP TYPE
-# TODO : CREATE VALUABLE DOCSTRINGS/COMMENTS
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,10 +16,6 @@ from jump_params import JUMP_PARAMS
 
 N_LEGS = 4
 N_JOINTS = 3
-
-Z_OFFSET = -0.220
-Y_OFFSET = 0.0838
-X_OFFSET = 0.0011
 
 KP_XY = 280.0
 KP_Z = 1250.0
@@ -43,6 +37,11 @@ def quadruped_jump(jump_type: str = "forward"):
     FORCE_FZ = params["FORCE_FZ"]
     N_JUMPS = params["N_JUMPS"]
     K_VMC = params["K_VMC"]
+
+    global X_OFFSET, Y_OFFSET, Z_OFFSET
+    X_OFFSET = params["X_OFFSET"]
+    Y_OFFSET = params["Y_OFFSET"]
+    Z_OFFSET = params["Z_OFFSET"]
 
     sim_options = SimulationOptions(
         on_rack=False,
