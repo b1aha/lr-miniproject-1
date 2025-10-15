@@ -20,9 +20,12 @@ from quadruped_jump import (
     virtual_model,
 )
 
+# === Global constants and controller gains ===
+# Quadruped model constants.
 N_LEGS = 4
 N_JOINTS = 3
 
+# Cartesian PD gains.
 KP_XY = 280.0
 KP_Z = 1250.0
 KD_FLIGHT_XY = 8.0
@@ -30,11 +33,22 @@ KD_FLIGHT_Z = 8.0
 KD_STANCE_XY = 40.0
 KD_STANCE_Z = 150.0
 
+# Stabilize wait time.
 EXTRA_WAIT_T = 1.0
 
 
 def run_single(jt: str):
+    """
+    Run repeated single-impulse demos for a chosen jt.
+
+    Args:
+        jt: Jump type (forward, lateral_left, etc.).
+
+    Returns:
+        None.
+    """
     params = OPTIMALS[jt]
+    # Pull nominal offsets (and VMC gain).
     qj.X_OFFSET = params["X_OFFSET"]
     qj.Y_OFFSET = params["Y_OFFSET"]
     qj.Z_OFFSET = params["Z_OFFSET"]
@@ -48,6 +62,8 @@ def run_single(jt: str):
     try:
         while True:
             simulator.reset()
+
+            # Build the tuned force profile.
             profile = FootForceProfile(
                 f0=params["IMPULSE_F0"],
                 f1=params["IDLE_F1"],
@@ -58,6 +74,7 @@ def run_single(jt: str):
 
             jump_T = profile.impulse_duration() + profile.idle_duration()
             n_imp = int(np.ceil(jump_T / sim_options.timestep))
+            # Stabilization wait.
             n_extra = int(np.ceil(EXTRA_WAIT_T / sim_options.timestep))
 
             for _ in range(n_imp):
@@ -113,14 +130,22 @@ def run_single(jt: str):
                     if waited >= n_extra:
                         break
     except KeyboardInterrupt:
+        # Exit gracefully on interrupt.
         pass
     finally:
         simulator.close()
 
 
 def run_hopping():
+    """
+    Run a continuous hopping demo.
+
+    Returns:
+        None.
+    """
     jt = "hopping"
     params = OPTIMALS[jt]
+    # Pull nominal offsets (and VMC gain).
     qj.X_OFFSET = params["X_OFFSET"]
     qj.Y_OFFSET = params["Y_OFFSET"]
     qj.Z_OFFSET = params["Z_OFFSET"]
@@ -166,12 +191,17 @@ def run_hopping():
                 simulator.set_motor_targets(tau)
                 simulator.step()
     except KeyboardInterrupt:
+        # Exit gracefully on interrupt.
         pass
     finally:
         simulator.close()
 
 
 if __name__ == "__main__":
+    # Minimal CLI:
+    #   python optimals_demo.py <jt>
+    # If <jt> == "hopping" -> run continuous hopping demo,
+    # else -> run repeated single-impulse demos for jt.
     jt = sys.argv[1] if len(sys.argv) > 1 else "forward"
     if jt == "hopping":
         run_hopping()
