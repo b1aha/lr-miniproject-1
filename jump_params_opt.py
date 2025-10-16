@@ -43,10 +43,10 @@ DECISION_VARS = {
         "Fz": {"low": 200.0, "high": 650.0}
     },
     "hopping": {
-        "f0": {"low": 0.8, "high": 8.0},
-        "f1": {"low": 0.2, "high": 6.0},
-        "Fx": {"low": 0.0, "high": 500.0},
+        "f0": {"low": 0.8, "high": 6.0},
+        "f1": {"low": 0.2, "high": 3.0},
+        "Fx": {"low": 0.0, "high": 400.0},
         "Fy": {"low": 0.0, "high": 0.0},
-        "Fz": {"low": 200.0, "high": 800.0}
+        "Fz": {"low": 200.0, "high": 700.0}
     }
 }

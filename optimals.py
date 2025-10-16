@@ -12,13 +12,13 @@ OPTIMALS = {
         "X_OFFSET": 0.0011
     },
     "hopping": {
-        "IMPULSE_F0": 3.193126179605,
-        "IDLE_F1": 0.878427717432,
-        "FORCE_FX": 326.541246125695,
+        "IMPULSE_F0": 4.085388693679,
+        "IDLE_F1": 2.873912812061,
+        "FORCE_FX": 119.446556238271,
         "FORCE_FY": 0.0,
-        "FORCE_FZ": 696.781313333667,
+        "FORCE_FZ": 238.043908974336,
         "N_JUMPS": 15,
-        "K_VMC": 0.0,
+        "K_VMC": 36.0,
         "Z_OFFSET": -0.22,
         "Y_OFFSET": 0.0838,
         "X_OFFSET": 0.0011

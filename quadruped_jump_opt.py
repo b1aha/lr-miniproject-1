@@ -44,6 +44,9 @@ KD_FLIGHT_Z = 8.0
 KD_STANCE_XY = 40.0
 KD_STANCE_Z = 150.0
 
+# VMC for hopping
+K_VMC_HOP = 36.0
+
 # === Optimization parameters and constraints ===
 N_TRIALS = 40                 # trials per Optuna study/seed
 SETTLE_T = 1.0                # wait cap after impulse (all feet touch)
@@ -52,6 +55,10 @@ HEIGHT_THRESH = 0.08          # minimum allowed base height
 HEIGHT_PENALTY = 2.0          # height penalty
 TILT_THRESH_DEG = 30.0        # maximum allowed tilt
 TILT_PENALTY = 1.5            # tilt penalty
+HEIGHT_THRESH_HOP = 0.18      # minimum allowed base height (hopping)
+HEIGHT_PENALTY_HOP = 15.0     # height penalty (hopping)
+TILT_THRESH_DEG_HOP = 7.0     # maximum allowed tilt (hopping)
+TILT_PENALTY_HOP = 15.0       # tilt penalty (hopping)
 
 
 def _yaw_from_R(R: np.ndarray) -> float:
@@ -140,6 +147,11 @@ def _write_optimals(jt: str, best_params: dict) -> None:
     base["FORCE_FX"] = best_params["Fx"]
     base["FORCE_FY"] = best_params["Fy"]
     base["FORCE_FZ"] = best_params["Fz"]
+
+    if jt == "hopping":
+        base["K_VMC"] = K_VMC_HOP
+    else:
+        base["K_VMC"] = JUMP_PARAMS[jt]["K_VMC"]
 
     data[jt] = _ordered_jump_dict(base)
 
@@ -254,8 +266,7 @@ def evaluate_jumping(trial: Trial, simulator: QuadSimulator, jt: str) -> float:
     Fy = trial.suggest_float("Fy", space["Fy"]["low"], space["Fy"]["high"])
     Fz = trial.suggest_float("Fz", space["Fz"]["low"], space["Fz"]["high"])
 
-    jt_apply = "forward" if jt == "hopping" else jt
-    K_VMC = JUMP_PARAMS[jt_apply]["K_VMC"]
+    K_VMC = K_VMC_HOP if jt == "hopping" else JUMP_PARAMS[jt]["K_VMC"]
 
     simulator.reset()
     dt = simulator.options.timestep
@@ -269,12 +280,11 @@ def evaluate_jumping(trial: Trial, simulator: QuadSimulator, jt: str) -> float:
     jump_T = profile.impulse_duration() + profile.idle_duration()
 
     if jt == "hopping":
-        # Hopping: run several cycles (≥2 s total), evaluate displacement rate.
-        total_T = max(6 * jump_T, 2.0)
+        total_T = max(10 * jump_T, 10.0)
         n_steps = int(np.ceil(total_T / dt))
         for _ in range(n_steps):
             profile.step(dt)
-            p, tilt = _apply_step(simulator, profile, jt_apply, K_VMC)
+            p, tilt = _apply_step(simulator, profile, jt, K_VMC)
             min_height = min(min_height, p[2])
             tilt_worst = max(tilt_worst, tilt)
         pend = np.array(simulator.get_base_position(), dtype=float)
@@ -287,7 +297,7 @@ def evaluate_jumping(trial: Trial, simulator: QuadSimulator, jt: str) -> float:
         n_imp = int(np.ceil(jump_T / dt))
         for _ in range(n_imp):
             profile.step(dt)
-            p, tilt = _apply_step(simulator, profile, jt_apply, K_VMC)
+            p, tilt = _apply_step(simulator, profile, jt, K_VMC)
             min_height = min(min_height, p[2])
             tilt_worst = max(tilt_worst, tilt)
 
@@ -300,7 +310,7 @@ def evaluate_jumping(trial: Trial, simulator: QuadSimulator, jt: str) -> float:
         # - start counting settle window once all feet are on ground
         # - stop after SETTLE_T worth of steps or MAX_WAIT cap
         while True:
-            p, tilt = _apply_step(simulator, None, jt_apply, K_VMC)
+            p, tilt = _apply_step(simulator, None, jt, K_VMC)
             min_height = min(min_height, p[2])
             tilt_worst = max(tilt_worst, tilt)
             t_since_impulse += dt
@@ -343,12 +353,24 @@ def evaluate_jumping(trial: Trial, simulator: QuadSimulator, jt: str) -> float:
     if not np.isfinite(score):
         return -1e3
 
+    # Be stricter on hopping.
+    if jt == "hopping":
+        height_thresh = HEIGHT_THRESH_HOP
+        tilt_thresh_deg = TILT_THRESH_DEG_HOP
+        height_penalty = HEIGHT_PENALTY_HOP
+        tilt_penalty = TILT_PENALTY_HOP
+    else:
+        height_thresh = HEIGHT_THRESH
+        tilt_thresh_deg = TILT_THRESH_DEG
+        height_penalty = HEIGHT_PENALTY
+        tilt_penalty = TILT_PENALTY
+
     # Penalty calculation.
     penalty = 0.0
-    if min_height < HEIGHT_THRESH:
-        penalty += HEIGHT_PENALTY
-    if tilt_worst > math.radians(TILT_THRESH_DEG):
-        penalty += TILT_PENALTY
+    if min_height < height_thresh:
+        penalty += height_penalty
+    if tilt_worst > math.radians(tilt_thresh_deg):
+        penalty += tilt_penalty
 
     return score - penalty
 
@@ -395,7 +417,7 @@ if __name__ == "__main__":
 
         simulator.close()
 
-        # Collect of results.
+        # Collection of results.
         scores = [t.value for t in study.trials if t.value is not None]
         all_scores.append(scores)
         best_values.append(study.best_value)
