@@ -55,10 +55,13 @@ HEIGHT_THRESH = 0.08          # minimum allowed base height
 HEIGHT_PENALTY = 2.0          # height penalty
 TILT_THRESH_DEG = 30.0        # maximum allowed tilt
 TILT_PENALTY = 1.5            # tilt penalty
+
 HEIGHT_THRESH_HOP = 0.18      # minimum allowed base height (hopping)
 HEIGHT_PENALTY_HOP = 15.0     # height penalty (hopping)
 TILT_THRESH_DEG_HOP = 7.0     # maximum allowed tilt (hopping)
 TILT_PENALTY_HOP = 15.0       # tilt penalty (hopping)
+
+TRIAL_LANDINGS = []           # collect every trial for plots
 
 
 def _yaw_from_R(R: np.ndarray) -> float:
@@ -372,6 +375,16 @@ def evaluate_jumping(trial: Trial, simulator: QuadSimulator, jt: str) -> float:
     if tilt_worst > math.radians(tilt_thresh_deg):
         penalty += tilt_penalty
 
+    # Store landing for plotting in main guard
+    TRIAL_LANDINGS.append((
+        jt,
+        float(dx),
+        float(dy),
+        float(dyaw),
+        float(score),
+        float(penalty)
+    ))
+
     return score - penalty
 
 
@@ -431,18 +444,20 @@ if __name__ == "__main__":
     std_val = float(
         np.std(best_values, ddof=0)
     ) if len(best_values) else float("nan")
+    max_val = float(np.max(best_values)) if len(best_values) else float("nan")
 
     print("Seeds:", seeds)
     print("Best values per seed:", best_values.tolist())
     print("Mean best value:", mean_val)
     print("Std best value:", std_val)
+    print("Max best value (objective):", max_val)
 
     # Write overall best parameters to optimals.py.
     best_idx = int(np.argmax(best_values)) if len(best_values) else 0
     _write_optimals(jt, best_params_by_seed[best_idx])
 
     # === Results plot ===
-    plt.figure(figsize=(9, 6))
+    plt.figure()
     for s, scores in zip(seeds, all_scores):
         if scores:
             plt.scatter(
@@ -451,12 +466,20 @@ if __name__ == "__main__":
                 s=36,
                 alpha=0.7,
             )
+    plt.fill_between(
+        [min(seeds) - 5, max(seeds) + 5],
+        mean_val - std_val,
+        mean_val + std_val,
+        color="red",
+        alpha=0.15,
+        label=f"Std dev: ±{std_val:.3f}"
+    )
     plt.axhline(
         mean_val,
         color="red",
         linestyle="--",
         linewidth=1.2,
-        label=f"Mean best value: ({mean_val:.3f})"
+        label=f"Mean best value: {mean_val:.3f}"
     )
 
     best_seed = seeds[best_idx]
@@ -467,7 +490,7 @@ if __name__ == "__main__":
         s=36,
         marker="s",
         color="black",
-        label=f"Best overall: ({best_score:.3f})"
+        label=f"Best overall: {best_score:.3f}"
     )
 
     plt.title(f"All trial scores per seed [{jt}]")
@@ -477,5 +500,57 @@ if __name__ == "__main__":
     plt.grid(False)
     plt.xlim(min(seeds) - 5, max(seeds) + 5)
     plt.legend()
-    plt.tight_layout()
+    plt.savefig(f"seeds_{jt}.pdf", format="pdf")
     plt.show()
+
+    if not jt.startswith(("twist", "hopping")) and TRIAL_LANDINGS:
+        xs = [x for jt_, x, y, dyaw, sc, pen in TRIAL_LANDINGS if jt_ == jt]
+        ys = [y for jt_, x, y, dyaw, sc, pen in TRIAL_LANDINGS if jt_ == jt]
+        pens = [
+            pen for jt_, x, y, dyaw, sc, pen in TRIAL_LANDINGS if jt_ == jt
+        ]
+
+        uniq = sorted(set(pens))
+        colors_map = {
+            0.0: "#1f77b4",
+            HEIGHT_PENALTY: "#ff7f0e",
+            TILT_PENALTY: "#2ca02c",
+            HEIGHT_PENALTY + TILT_PENALTY: "#d62728",
+        }
+        cvals = [colors_map.get(p, "gray") for p in pens]
+
+        plt.figure()
+        plt.scatter(xs, ys, c=cvals, s=28, alpha=0.85)
+        plt.scatter(0, 0, marker="x", s=60, color="black", label="Start")
+        plt.axhline(0, lw=0.6, color="0.8")
+        plt.axvline(0, lw=0.6, color="0.8")
+        plt.xlabel("x (forward) [m]")
+        plt.ylabel("y (lateral) [m]")
+        plt.title(f"Landing positions (top-down) [{jt}]")
+        plt.grid(True, linestyle=":", linewidth=0.6, alpha=0.6)
+
+        labels = [
+            "No penalty",
+            "Height penalty",
+            "Tilt penalty",
+            "Height + tilt penalty",
+        ]
+        handles = [
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor=colors_map[v],
+                markersize=7
+            )
+            for v in [
+                0.0,
+                HEIGHT_PENALTY,
+                TILT_PENALTY,
+                HEIGHT_PENALTY + TILT_PENALTY
+            ]
+        ]
+        plt.legend(handles, labels, loc="upper right")
+        plt.savefig(f"landings_{jt}.pdf", format="pdf")
+        plt.show()

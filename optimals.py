@@ -12,11 +12,11 @@ OPTIMALS = {
         "X_OFFSET": 0.0011
     },
     "hopping": {
-        "IMPULSE_F0": 4.085388693679,
-        "IDLE_F1": 2.873912812061,
-        "FORCE_FX": 119.446556238271,
+        "IMPULSE_F0": 3.004350244418,
+        "IDLE_F1": 2.195267477404,
+        "FORCE_FX": 98.234608040807,
         "FORCE_FY": 0.0,
-        "FORCE_FZ": 238.043908974336,
+        "FORCE_FZ": 354.15102677,
         "N_JUMPS": 15,
         "K_VMC": 36.0,
         "Z_OFFSET": -0.22,
@@ -24,11 +24,11 @@ OPTIMALS = {
         "X_OFFSET": 0.0011
     },
     "lateral_left": {
-        "IMPULSE_F0": 0.975524494201,
-        "IDLE_F1": 1.569501022304,
+        "IMPULSE_F0": 2.520564832987,
+        "IDLE_F1": 2.087990297263,
         "FORCE_FX": 0.0,
-        "FORCE_FY": 84.608509728088,
-        "FORCE_FZ": 241.140199980977,
+        "FORCE_FY": 84.823702100686,
+        "FORCE_FZ": 293.106518854704,
         "N_JUMPS": 15,
         "K_VMC": 8.0,
         "Z_OFFSET": -0.23,
@@ -36,11 +36,11 @@ OPTIMALS = {
         "X_OFFSET": 0.0
     },
     "lateral_right": {
-        "IMPULSE_F0": 1.105616865462,
-        "IDLE_F1": 2.753694311829,
+        "IMPULSE_F0": 0.996005051569,
+        "IDLE_F1": 0.376570141267,
         "FORCE_FX": 0.0,
-        "FORCE_FY": -94.807526798014,
-        "FORCE_FZ": 206.349062243167,
+        "FORCE_FY": -99.089050472824,
+        "FORCE_FZ": 247.794090359171,
         "N_JUMPS": 15,
         "K_VMC": 10.0,
         "Z_OFFSET": -0.23,

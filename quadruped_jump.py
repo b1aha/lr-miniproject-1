@@ -317,7 +317,7 @@ def quadruped_jump(jt: str) -> None:
 
     # === Force profile plot ===
     if len(force_log) > 0:
-        plt.figure(figsize=(10, 5))
+        plt.figure()
         plt.plot(time_log, force_log[:, 0], label="Fx")
         plt.plot(time_log, force_log[:, 1], label="Fy")
         plt.plot(time_log, force_log[:, 2], label="Fz")
@@ -326,7 +326,7 @@ def quadruped_jump(jt: str) -> None:
         plt.title("Foot Force Profile Over Time")
         plt.grid(True)
         plt.legend()
-        plt.tight_layout()
+        plt.savefig(f"forces_{jt}.pdf", format="pdf")
         plt.show()
 
     # === Torques plot ===
@@ -346,7 +346,7 @@ def quadruped_jump(jt: str) -> None:
             if leg_id in (2, 3):
                 ax.set_xlabel("Time (s)")
             ax.legend(fontsize=8)
-        plt.tight_layout()
+        plt.savefig(f"torques_{jt}.pdf", format="pdf")
         plt.show()
 
     # === Trajectory plot===
@@ -354,7 +354,7 @@ def quadruped_jump(jt: str) -> None:
     if len(pos_log) > 0:
         # Subtract initial XY for relative plot.
         xy = pos_log[:, :2] - pos_log[0, :2]
-        plt.figure(figsize=(6, 6))
+        plt.figure()
         plt.plot(xy[:, 0], xy[:, 1])
         plt.scatter([0], [0], s=60)
         plt.scatter([xy[-1, 0]], [xy[-1, 1]], s=60)
@@ -363,7 +363,7 @@ def quadruped_jump(jt: str) -> None:
         plt.ylabel("Y (m)")
         plt.title("Top-Down Base Trajectory (start at [0, 0])")
         plt.grid(True)
-        plt.tight_layout()
+        plt.savefig(f"traj_{jt}.pdf", format="pdf")
         plt.show()
 
 
