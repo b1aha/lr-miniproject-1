@@ -18,7 +18,7 @@ OPTIMALS = {
         "FORCE_FY": 0.0,
         "FORCE_FZ": 354.15102677,
         "N_JUMPS": 15,
-        "K_VMC": 36.0,
+        "K_VMC": 20.0,
         "Z_OFFSET": -0.22,
         "Y_OFFSET": 0.0838,
         "X_OFFSET": 0.0011

@@ -45,7 +45,7 @@ KD_STANCE_XY = 40.0
 KD_STANCE_Z = 150.0
 
 # VMC for hopping
-K_VMC_HOP = 36.0
+K_VMC_HOP = 20.0
 
 # === Optimization parameters and constraints ===
 N_TRIALS = 40                 # trials per Optuna study/seed

@@ -439,7 +439,7 @@ if __name__ == "__main__":
         t1, r1, p1 = run_once(jt, JUMP_PARAMS[jt]["K_VMC"])  # run w/ VMC on
 
         # === VMC comparison plot ===
-        plt.figure(figsize=(10, 6))
+        plt.figure()
         plt.plot(t0, r0, "-", color="black", label="roll (VMC off)")
         plt.plot(t0, p0, "-", color="red", label="pitch (VMC off)")
         plt.plot(t1, r1, "-", color="green", label="roll (VMC on)")
@@ -448,5 +448,5 @@ if __name__ == "__main__":
         plt.xlabel("time (s)")
         plt.ylabel("angle (rad)")
         plt.legend()
-        plt.tight_layout()
+        plt.savefig(f"vmc_{jt}.pdf", format="pdf")
         plt.show()
