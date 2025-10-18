@@ -39,7 +39,6 @@ JUMP_PARAMS = {
         "FORCE_FZ": 230.0,
         "N_JUMPS": 15,
         "K_VMC": 10.0,
-        # "K_VMC": 100.0, # FOR VMC COMPARISON
         "Z_OFFSET": -0.230,
         "Y_OFFSET": 0.1050,
         "X_OFFSET": 0.0000,
